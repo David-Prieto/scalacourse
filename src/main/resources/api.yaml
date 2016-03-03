@@ -1,0 +1,207 @@
+swagger: '2.0'
+info:
+  version: "1.0.0"
+paths:
+  /projects:
+    get:
+      description: |
+        Returns all projects from the system
+      operationId: findProjects
+      parameters:
+        - name: names
+          in: query
+          description: names to filter by
+          required: false
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
+        - name: limit
+          in: query
+          description: maximum number of results to return
+          required: false
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: project response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Project'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      description: Creates a new project in the registry.
+      operationId: addProject
+      parameters:
+        - name: project
+          in: body
+          description: Project to add to the registry
+          required: true
+          schema:
+            $ref: '#/definitions/Project'
+      responses:
+        '200':
+          description: project response
+          schema:
+            $ref: '#/definitions/Project'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/projects/{name}':
+    get:
+      description: 'Returns a project based on a name'
+      operationId: find project by name
+      parameters:
+        - name: name
+          in: path
+          description: name of project to fetch
+          required: true
+          type: string
+      responses:
+        '200':
+          description: project response
+          schema:
+            $ref: '#/definitions/Project'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      description: Creates a new task to given project in the registry.
+      operationId: addTask
+      parameters:
+        - name: name
+          in: path
+          description: name of project to fetch
+          required: true
+          type: string
+        - name: task
+          in: body
+          description: Task to add to the project
+          required: true
+          schema:
+            $ref: '#/definitions/Task'
+      responses:
+        '200':
+          description: task response
+          schema:
+            $ref: '#/definitions/Task'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: deletes a single project based on the name supplied
+      operationId: deleteProject
+      parameters:
+        - name: name
+          in: path
+          description: name of project to delete
+          required: true
+          type: string
+      responses:
+        '204':
+          description: project deleted
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/projects/{name}/{task_name}':
+    get:
+      description: Returns a particular task of a given project
+      operationId: find task of project
+      parameters:
+        - name: name
+          in: path
+          description: name of project to fetch task
+          required: true
+          type: string
+        - name: task_name
+          in: path
+          description: name of task to fetch
+          required: true
+          type: string
+      responses:
+        '200':
+          description: task response
+          schema:
+            $ref: '#/definitions/Task'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: deletes a single task based on the names of project and task supplied
+      operationId: deleteTask
+      parameters:
+        - name: name
+          in: path
+          description: name of project to fetch delete
+          required: true
+          type: string
+        - name: task_name
+          in: path
+          description: name of task to delete
+          required: true
+          type: string
+      responses:
+        '204':
+          description: task deleted
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Project:
+    required:
+      - name
+      - leader
+      - date_start
+      - date_end
+      - tasks
+      - complete_rate
+    properties:
+      name:
+        type: string
+      leader:
+        type: string
+      date_start:
+        type: string
+        format: date
+      date_end:
+        type: string
+        format: date
+      tasks:
+        type: array
+        items:
+          $ref: '#/definitions/Task'
+      complete_rate:
+        type: integer
+        format: int32
+  Task:
+    required:
+      - task_name
+      - assigned_user
+      - completed
+    properties:
+      task_name:
+        type: string
+      assigned_user:
+        type: string
+      completed:
+        type: boolean
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
